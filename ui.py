@@ -38,7 +38,6 @@ class UserInterface:
             self.root.bind(str(i+1),lambda event,button=button:self.set_focus(button))
 
     def set_focus(self,event) -> None:
-        print("inside")
         self.should_ocr_run = False
         current_focus = self.root.focus_get()
         buttons = list(self.buttons.values())
@@ -79,7 +78,7 @@ class UserInterface:
 
     def license_plate_process(self) -> None:
         while self.should_ocr_run:
-            img = cv2.imread('/home/pi/Desktop/ocr/testimg/bus/image.webp')
+            img = self.client.getFrame()
             self.highlight(self.detector.getNumber(img))
     
     def connect(self, ssid):

@@ -2,11 +2,12 @@
 # Lets import the libraries
 import socket, cv2, pickle,struct,imutils
 from imutils.video import VideoStream
+from networking import Network
 
 class VideoServer:
 	def __init__(self) -> None:
 		self.server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		host_ip = '192.168.248.94'
+		host_ip = Network().get_host_ip()
 		port = 9999
 		self.socket_address = (host_ip,port)
 	
@@ -31,3 +32,4 @@ class VideoServer:
 			except KeyboardInterrupt:
 				print("close")
 				client_socket.close()
+VideoServer().start_server()

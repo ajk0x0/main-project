@@ -4,6 +4,8 @@ import imutils
 import pytesseract
 from PIL import Image
 import string
+import math
+from utils import show_img
 table = str.maketrans('', '', string.ascii_lowercase)
 
 class LicensePlateDetector:
@@ -69,44 +71,72 @@ class LicensePlateDetector:
          return text
 
    def getNumber(self, img) -> str:
-      (H, W) = img.shape[:2]
+      if img is None:
+         raise Exception("Failed to load the image")
       gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
       blur = cv2.bilateralFilter(gray, 11, 17, 17)
       edged = cv2.Canny(blur, 30, 200)
-      #closing
-      edged= cv2.dilate(edged,np.ones((3,3),np.uint8))
-      edged= cv2.erode(edged,np.ones((3,3),np.uint8)) 
-      #closed
+      edged = cv2.dilate(edged, np.ones((3,3), np.uint8))
+      edged = cv2.erode(edged, np.ones((3,3), np.uint8))
+
       conts = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-      conts = imutils.grab_contours(conts) 
-      conts = sorted(conts, key=cv2.contourArea, reverse=True)[:8] 
+      conts = imutils.grab_contours(conts)
+      conts = sorted(conts, key=cv2.contourArea, reverse=True)[:8]
+
       location = None
       for c in conts:
-         peri = cv2.arcLength(c, True)
-         aprox = cv2.approxPolyDP(c, 0.02 * peri, True)
-         if cv2.isContourConvex(aprox):
-            if len(aprox) == 4:
-               location = aprox
-               break
+          peri = cv2.arcLength(c, True)
+          approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+          if cv2.isContourConvex(approx):
+              if len(approx) == 4:
+                  location = approx
+                  break
+
       if location is None:
-        raise Exception("Failed to detect license plate contours")
-      mask = np.zeros(gray.shape, np.uint8) 
-      img_plate = cv2.drawContours(mask, [location], 0, 255, -1)
-      img_plate = cv2.bitwise_and(img, img, mask=mask)
+          raise Exception("Failed to detect license plate contours")
 
-      (y, x) = np.where(mask==255)
-      (beginX, beginY) = (np.min(x), np.min(y))
-      (endX, endY) = (np.max(x), np.max(y))
+      # Sort the corner points of the license plate contour
+      location = location.reshape(4, 2)
+      rect = np.zeros((4, 2), dtype="float32")
+      s = location.sum(axis=1)
+      rect[0] = location[np.argmin(s)]
+      rect[2] = location[np.argmax(s)]
+      diff = np.diff(location, axis=1)
+      rect[1] = location[np.argmin(diff)]
+      rect[3] = location[np.argmax(diff)]
 
-      plate = gray[beginY:endY, beginX:endX]
-      plate=cv2.resize(plate, None, fx = 2, fy = 2, interpolation = cv2.INTER_CUBIC)
-      plate=cv2.GaussianBlur(plate, (5, 5), 0)
+      (tl, tr, br, bl) = rect
 
-      im=Image.fromarray(plate)
+      # Calculate the width and height of the license plate region
+      widthA = math.sqrt((tl[0] - tr[0]) ** 2 + (tl[1] - tr[1]) ** 2)
+      widthB = math.sqrt((bl[0] - br[0]) ** 2 + (bl[1] - br[1]) ** 2)
+      maxWidth = max(int(widthA), int(widthB))
+
+      heightA = math.sqrt((tl[0] - bl[0]) ** 2 + (tl[1] - bl[1]) ** 2)
+      heightB = math.sqrt((tr[0] - br[0]) ** 2 + (tr[1] - br[1]) ** 2)
+      maxHeight = max(int(heightA), int(heightB))
+
+      # Create a perspective transformation matrix and apply it to the image
+      dst = np.array([[0, 0], [maxWidth - 1, 0], [maxWidth - 1, maxHeight - 1], [0, maxHeight - 1]], dtype="float32")
+      M = cv2.getPerspectiveTransform(rect, dst)
+      warped = cv2.warpPerspective(gray, M, (maxWidth, maxHeight))
+
+      # Perform additional processing on the warped license plate image
+      warped = cv2.resize(warped, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+      warped = cv2.GaussianBlur(warped, (5, 5), 0)
+
+      im = Image.fromarray(warped)
       # im.show()
-      config_tesseract = "--tessdata-dir tessdata --psm 6"
-      text = pytesseract.image_to_string(plate, lang="eng")
-      text="".join(ch for ch in text if ch.isalnum())
-      text=text.translate(table)
-      return self._checkSeries(self._checkLastFour(  \
+
+      # config_tesseract = "--tessdata-dir tessdata --psm 6"
+      text = pytesseract.image_to_string(warped, lang="eng")
+      text = "".join(ch for ch in text if ch.isalnum())
+      text = text.translate(table)
+      if len(text)<9:
+         print(text)
+         print("Detected Text length is not sufficient")
+         return ""
+      num = self._checkSeries(self._checkLastFour(  \
          self._checkRTO(self._checkState(text))))
+      print(num)
+      return num

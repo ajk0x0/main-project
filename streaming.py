@@ -1,5 +1,4 @@
 import socket,cv2, pickle,struct
-from imutils.video import VideoStream
 from networking import Network
 
 class VideoClient:
@@ -7,7 +6,7 @@ class VideoClient:
         self.network = Network()
         self.host_ip = self.network.get_host_ip()
         self.port = 9999
-        self.camera = VideoStream(-1,resolution=(280,280),framerate=24).start()
+        self.camera = cv2.VideoCapture(-1)
 
     def start_stream(self) -> None:
         client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)

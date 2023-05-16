@@ -79,6 +79,7 @@ class UserInterface:
     def license_plate_process(self) -> None:
         while self.should_ocr_run:
             img = self.client.getFrame()
+            print("new frames")
             self.highlight(self.detector.getNumber(img))
     
     def connect(self, ssid):

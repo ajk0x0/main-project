@@ -38,11 +38,12 @@ class UserInterface:
             self.root.bind(str(i+1),lambda event,button=button:self.set_focus(button))
 
     def set_focus(self,event) -> None:
+        print("inside")
         self.should_ocr_run = False
         current_focus = self.root.focus_get()
-        buttons = self.buttons.values()
+        buttons = list(self.buttons.values())
         try:
-            index = self.buttons.index(current_focus)
+            index = buttons.index(current_focus)
         except ValueError:
             index = -1
         if event.keysym == "Up":

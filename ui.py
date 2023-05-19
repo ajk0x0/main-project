@@ -93,3 +93,4 @@ class UserInterface:
         image_process.start()
         self.root.mainloop()
 
+UserInterface().start()

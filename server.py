@@ -1,11 +1,29 @@
 # This code is for the server 
 # Lets import the libraries
 import socket, cv2, pickle,struct,imutils
+import netifaces
 from imutils.video import VideoStream
+
+
+def get_host_ip():
+	interfaces = netifaces.interfaces()
+	print(interfaces)
+	for interface in interfaces:
+		if interface.startswith('w'):  # Assuming Wi-Fi interface starts with 'wlan'
+			try:
+				addresses = netifaces.ifaddresses(interface)
+				ip_address = addresses[netifaces.AF_INET][0]['addr'].split(".")
+				print(ip_address)
+				ip_address[-1] = "254"
+				return ".".join(ip_address)
+			except (KeyError, IndexError):
+				pass
+	return None
 
 # Socket Create
 server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 host_name  = socket.gethostname()
+print(get_host_ip())
 host_ip = '192.168.248.94'
 print('HOST IP:',host_ip)
 port = 9999

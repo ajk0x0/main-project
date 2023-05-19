@@ -87,9 +87,11 @@ top.bind('<Key>',handle_key)
 # highlight(getNumber(), ssid_button)
 # Set up callbacks for GPIO buttons
 def up_pressed(channel):
+    channel.widget.config(bg="light blue")
     top.event_generate('<Up>', when='tail')
     print('up')
 def down_pressed(channel):
+    channel.widget.config(bg="light blue")
     top.event_generate('<Down>', when='tail')
     print('down')
 def enter_pressed(channel):

@@ -72,7 +72,11 @@ class LicensePlateDetector:
       (H, W) = img.shape[:2]
       gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
       blur = cv2.bilateralFilter(gray, 11, 17, 17)
-      edged = cv2.Canny(blur, 30, 200) 
+      edged = cv2.Canny(blur, 30, 200)
+      #closing
+      edged= cv2.dilate(edged,np.ones((3,3),np.uint8))
+      edged= cv2.erode(edged,np.ones((3,3),np.uint8)) 
+      #closed
       conts = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
       conts = imutils.grab_contours(conts) 
       conts = sorted(conts, key=cv2.contourArea, reverse=True)[:8] 
@@ -84,6 +88,8 @@ class LicensePlateDetector:
             if len(aprox) == 4:
                location = aprox
                break
+      if location is None:
+        raise Exception("Failed to detect license plate contours")
       mask = np.zeros(gray.shape, np.uint8) 
       img_plate = cv2.drawContours(mask, [location], 0, 255, -1)
       img_plate = cv2.bitwise_and(img, img, mask=mask)

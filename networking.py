@@ -28,8 +28,7 @@ class Network:
         return None
 
     def connect_wifi(self, ssid, password) -> None:
-        global current_wifi
-        if (ssid != current_wifi):
+        if (ssid != self.scurrent_wifi):
                 subprocess.check_output( \
                     shlex.split(f"nmcli device wifi connect {ssid} password {password}") \
                         )

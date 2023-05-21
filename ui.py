@@ -79,13 +79,14 @@ class UserInterface:
     def license_plate_process(self) -> None:
         while self.should_ocr_run:
             img = self.client.getFrame()
-            print("new frames")
-            self.highlight(self.detector.getNumber(img))
+            number = self.detector.getNumber(img)
+            print("new frames, detected: ", number)
+            self.highlight(number)
     
     def connect(self, ssid):
         def showDialogue():
             self.network.connect_wifi(ssid,ssid)
-            self.client.start_stream(self.client.host_ip, self.client.port)
+            self.client.start_stream()
         return showDialogue 
 
     def start(self) -> None:

@@ -93,7 +93,8 @@ class LicensePlateDetector:
                   break
 
       if location is None:
-          raise Exception("Failed to detect license plate contours")
+          print("Failed to detect license plate contours")
+          return ""
 
       # Sort the corner points of the license plate contour
       location = location.reshape(4, 2)

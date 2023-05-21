@@ -21,14 +21,14 @@ class Network:
                     print(ip_address)
                     ip_address[-1] = "254"
                     #return ".".join(ip_address)
-                    return "192.168.248.137"
+                    return "192.168.202.137"
 
                 except (KeyError, IndexError):
                     pass
         return None
 
     def connect_wifi(self, ssid, password) -> None:
-        if (ssid != self.scurrent_wifi):
+        if (ssid != self.current_wifi):
                 subprocess.check_output( \
                     shlex.split(f"nmcli device wifi connect {ssid} password {password}") \
                         )

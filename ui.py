@@ -45,6 +45,7 @@ class UserInterface:
         buttons = list(self.buttons.values())
         try:
             index = buttons.index(current_focus)
+            buttons[index].config(bg='light gray')
         except ValueError:
             index = -1
         if event.keysym == "Up":
@@ -55,10 +56,17 @@ class UserInterface:
             index = 0
         elif index < 0:
             index = len(buttons) - 1
+        buttons[index].config(bg='light blue')
         buttons[index].focus()
     
     def highlight(self, number) -> None:
-        if number in self.buttons: self.buttons[number].focus()
+        buttons = list(self.buttons.values())
+        current_focus = self.root.focus_get()
+        index = buttons.index(current_focus)
+        buttons[index].config(bg='light gray')
+        if number in self.buttons: 
+            self.buttons[number].config(bg='light blue')
+            self.buttons[number].focus()
         else: print('no network found', number)
     
     # On key-press actions

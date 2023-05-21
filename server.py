@@ -16,6 +16,7 @@ class VideoServer:
 		self.server_socket.bind(self.socket_address)
 		self.server_socket.listen(5)
 		while True:
+			print("last connection closed")
 			client_socket,addr = self.server_socket.accept()
 			try:
 				print('GOT CONNECTION FROM:',addr)
@@ -32,4 +33,3 @@ class VideoServer:
 			except KeyboardInterrupt:
 				print("close")
 				client_socket.close()
-VideoServer().start_server()

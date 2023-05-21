@@ -27,7 +27,7 @@ class VideoClient:
                 data  = data[msg_size:]
                 frame = pickle.loads(frame_data)
 
-                cv2.namedWindow("RECEIVING VIDEO", cv2.WINDOW_NORMAL)
+                cv2.namedWindow("RECEIVING VIDEO", cv2.WINDOW_FULLSCREEN)
                 cv2.resizeWindow("RECEIVING VIDEO", 640, 480)
                 cv2.imshow("RECEIVING VIDEO",frame)
                 cv2.moveWindow("RECEIVING VIDEO", 40,30)

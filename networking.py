@@ -1,13 +1,12 @@
 import subprocess
-import shlex, netifaces
+import shlex, netifaces, re
 
 class Network:
     def __init__(self) -> None:
         output = subprocess.check_output(['nmcli', '-f', 'SSID', 'dev', 'wifi'])
         output = output.decode('utf-8')
         networks = [i.strip() for i in output.split('\n')[1:] if i]
-        self.available_networks = list(set(networks))
-
+        self.available_networks = self.filter_network(list(set(networks)))
         output = subprocess.check_output(['iwgetid', '-r']).decode('utf-8')
         self.current_wifi = output.strip()
 
@@ -26,6 +25,10 @@ class Network:
                 except (KeyError, IndexError):
                     pass
         return None
+
+    def filter_network(self, networks):
+        pattern = r'^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$'
+        return [network for network in networks if re.match(pattern, network)]
 
     def connect_wifi(self, ssid, password) -> None:
         if (ssid != self.current_wifi):

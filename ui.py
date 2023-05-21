@@ -25,7 +25,7 @@ class UserInterface:
     def generate_layout(self) -> None:
         self.root = Tk()
         self.root.geometry("640x480")
-        self.root.attributes('-fullscreen', True)
+        # self.root.attributes('-fullscreen', True)
         self.buttons = {}
         self.root.bind('<Up>', lambda event: self.set_focus(event))
         self.root.bind('<Down>', lambda event: self.set_focus(event))

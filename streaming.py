@@ -32,10 +32,11 @@ class VideoClient:
                 cv2.imshow("RECEIVING VIDEO",frame)
                 cv2.moveWindow("RECEIVING VIDEO", 40,30)
                 cv2.resizeWindow("Resized_Window", width, height)
-                if cv2.waitKey(1) == '13':
-                        break
-                cv2.getWindowProperty("RECEIVING VIDEO", 0)
-        client_socket.close()
+                if str(cv2.waitKey(1)) == '13':
+                        client_socket.close()
+                        cv2.getWindowProperty("RECEIVING VIDEO", 0)
+                        cv2.destroyAllWindows()
+                        return
 
     def getFrame(self):
         ret, frame = self.camera.read()

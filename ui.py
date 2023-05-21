@@ -88,7 +88,7 @@ class UserInterface:
     def connect(self, ssid):
         def showDialogue():
             self.network.connect_wifi(ssid,ssid)
-            self.client.start_stream()
+            self.client.start_stream(self.root.winfo_screenwidth(), self.root.winfo_screenheight())
         return showDialogue 
 
     def start(self) -> None:

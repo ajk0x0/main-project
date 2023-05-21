@@ -20,8 +20,8 @@ class Network:
                     ip_address = addresses[netifaces.AF_INET][0]['addr'].split(".")
                     print(ip_address)
                     ip_address[-1] = "137"
-                    return ".".join(ip_address)
-                    # return "192.168.202.137"
+                    # return ".".join(ip_address)
+                    return "192.168.43.137"
 
                 except (KeyError, IndexError):
                     pass
